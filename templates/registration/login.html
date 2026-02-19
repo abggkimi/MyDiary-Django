@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block title %}ログイン{% endblock %}
+
+{% block content %}
+    <section class="page-section">
+        <div class="section-header">
+            <h1 class="section-title">ログイン</h1>
+        </div>
+        <form method="post" class="form-card">
+            {% csrf_token %}
+            {% if form.non_field_errors %}
+                <div class="form-errors">
+                    {% for error in form.non_field_errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            <div class="form-field">
+                <label for="username">ユーザー名</label>
+                <input type="text" name="username" id="username" value="{{ form.username.value|default_if_none:'' }}" autocomplete="username">
+                {% if form.username.errors %}
+                    <div class="field-errors">
+                        {% for error in form.username.errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+            <div class="form-field">
+                <label for="password">パスワード</label>
+                <input type="password" name="password" id="password" autocomplete="current-password">
+                {% if form.password.errors %}
+                    <div class="field-errors">
+                        {% for error in form.password.errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+            <div class="action-row">
+                <button type="submit" class="btn btn-primary">ログイン</button>
+            </div>
+        </form>
+    </section>
+{% endblock %}

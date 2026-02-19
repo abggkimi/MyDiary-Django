@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block title %}アカウント作成{% endblock %}
+{% block h1 %}アカウント作成{% endblock %}
+{% block content %}
+<section class="page-section">
+    <div class="section-header">
+        <h1 class="section-title">アカウント作成</h1>
+    </div>
+    <form action="" method="post" class="form-card">
+        {% csrf_token %}
+        {% if form.non_field_errors %}
+            <div class="form-errors">
+                {% for error in form.non_field_errors %}
+                    <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+        <div class="form-field">
+            <label for="id_username">ユーザー名</label>
+            <input type="text" name="username" id="id_username" placeholder="ユーザー名" value="{{ form.username.value|default_if_none:'' }}" autocomplete="username">
+            {% if form.username.errors %}
+                <div class="field-errors">
+                    {% for error in form.username.errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+        <div class="form-field">
+            <label for="id_password1">パスワード</label>
+            <input type="password" name="password1" id="id_password1" placeholder="パスワード" autocomplete="new-password">
+            {% if form.password1.errors %}
+                <div class="field-errors">
+                    {% for error in form.password1.errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+        <div class="form-field">
+            <label for="id_password2">パスワード確認</label>
+            <input type="password" name="password2" id="id_password2" placeholder="パスワード確認" autocomplete="new-password">
+            {% if form.password2.errors %}
+                <div class="field-errors">
+                    {% for error in form.password2.errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+        <div class="action-row">
+            <button type="submit" class="btn btn-primary">アカウント作成</button>
+        </div>
+    </form>
+</section>
+{% endblock %}

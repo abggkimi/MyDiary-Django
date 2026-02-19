@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}My日記一覧{% endblock %}
+{% block content %}
+    <section class="page-section">
+        <div class="section-header">
+            <h2 class="diary-title">My日記一覧</h2>
+            {% if query %}
+                <p class="section-subtitle">検索結果: "{{ query }}"</p>
+            {% endif %}
+        </div>
+        <div class="card-grid">
+            {% for diary in diary_list %}
+                <article class="card diary-card">
+                    <h3 class="card-title">
+                        <a href="{% url 'diary-detail' diary.pk %}" class="diary-detail-link">{{ diary.title }}</a>
+                    </h3>
+                    <p class="card-content">{{ diary.content }}</p>
+                    <div class="card-meta">
+                        <span>作成日時：{{ diary.created_at }}</span>
+                        <span>更新日時：{{ diary.updated_at }}</span>
+                    </div>
+                </article>
+            {% empty %}
+                <div class="empty-state">
+                    <p>該当する日記がありません。</p>
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+{% endblock %}

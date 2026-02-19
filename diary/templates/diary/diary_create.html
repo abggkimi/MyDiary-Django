@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block title %}日記作成{% endblock %}
+
+{% block content %}
+    <section class="page-section">
+        <div class="section-header">
+            <h1 class="section-title">日記作成</h1>
+        </div>
+        <form method="post" class="form-card">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <div class="action-row">
+                <button type="submit" class="btn btn-primary">作成</button>
+            </div>
+        </form>
+    </section>
+{% endblock %}

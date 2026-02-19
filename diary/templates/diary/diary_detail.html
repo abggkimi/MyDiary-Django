@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block title %}日記詳細{% endblock %}
+{% block content %}
+    <section class="page-section">
+        <article class="card diary-detail-card">
+            <h1 class="detail-title">{{ diary.title }}</h1>
+            <p class="detail-content">{{ diary.content }}</p>
+            <div class="card-meta">
+                <span>作成日時：{{ diary.created_at }}</span>
+                <span>更新日時：{{ diary.updated_at }}</span>
+            </div>
+            <div class="action-row">
+                <a href="{% url 'diary-update' diary.pk %}" class="btn btn-outline-primary">編集</a>
+                <a href="{% url 'diary-delete' diary.pk %}" class="btn btn-outline-danger">削除</a>
+                <a href="{% url 'diary-list' %}" class="btn btn-light">一覧に戻る</a>
+            </div>
+        </article>
+    </section>
+{% endblock %}

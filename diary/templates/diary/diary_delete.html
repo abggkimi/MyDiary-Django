@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block title %}日記削除{% endblock %}
+
+{% block content %}
+    <section class="page-section">
+        <div class="section-header">
+            <h1 class="section-title">日記削除</h1>
+            <p class="section-subtitle">本当に削除しますか？</p>
+        </div>
+        <form method="post" class="form-card">
+            {% csrf_token %}
+            <div class="action-row">
+                <button type="submit" class="btn btn-danger">削除</button>
+                <a href="{% url 'diary-detail' diary.pk %}" class="btn btn-light">キャンセル</a>
+            </div>
+        </form>
+    </section>
+{% endblock %}

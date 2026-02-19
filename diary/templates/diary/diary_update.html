@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block title %}日記更新{% endblock %}
+
+{% block content %}
+    <section class="page-section">
+        <div class="section-header">
+            <h1 class="section-title">日記更新</h1>
+        </div>
+        <form method="post" class="form-card">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <div class="action-row">
+                <button type="submit" class="btn btn-primary">更新</button>
+                <a href="{% url 'diary-detail' diary.pk %}" class="btn btn-light">キャンセル</a>
+            </div>
+        </form>
+    </section>
+    
+    
+    
+{% endblock %}
