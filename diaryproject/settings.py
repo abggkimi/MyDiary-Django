@@ -17,16 +17,51 @@ import os
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
+def _env_bool(name, default=False):
+    value = os.environ.get(name)
+    if value is None:
+        return default
+    return value.strip().lower() in {'1', 'true', 'yes', 'on'}
+
+
+def _env_list(name, default=''):
+    return [item.strip() for item in os.environ.get(name, default).split(',') if item.strip()]
+
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-3_&@x(qhj4@zm))_j*lp^ja43re#v@7@2jgqa+kx1*biadh=jm'
+# 本番では必ず環境変数 DJANGO_SECRET_KEY を設定する。
+# 未設定時の値はローカル確認用で、リポジトリに含まれるため本番では使わない。
+SECRET_KEY = os.environ.get(
+    'DJANGO_SECRET_KEY',
+    '9pGzm5HidY-Wz3o4vFbxUW4ppBm1KQXYbBTYejFVFATBl7cWR54NG5kzDp8Ejv34loG3X4jgRn9HB1LenFGgyA',
+)
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# ローカルの HTTP 開発サーバは DJANGO_DEBUG=true で起動する。
+DEBUG = _env_bool('DJANGO_DEBUG', default=False)
 
-ALLOWED_HOSTS = []
+# 本番のホスト名は DJANGO_ALLOWED_HOSTS=example.com,www.example.com のように渡す。
+ALLOWED_HOSTS = _env_list('DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1,[::1]')
+
+# サイト全体が HTTPS のみのときだけ有効にする。
+# HTTP で開発する場合は DJANGO_DEBUG=true、または DJANGO_USE_HTTPS=false。
+if 'DJANGO_USE_HTTPS' in os.environ:
+    _USE_HTTPS = _env_bool('DJANGO_USE_HTTPS')
+else:
+    _USE_HTTPS = not DEBUG
+
+if _USE_HTTPS:
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    # 初期導入で影響を抑えたい場合は DJANGO_SECURE_HSTS_SECONDS を短い秒数にする。
+    # サブドメインも含めて HTTPS だけになったあとに長い値へ上げる。
+    SECURE_HSTS_SECONDS = int(os.environ.get('DJANGO_SECURE_HSTS_SECONDS', '31536000'))
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    # TLS をリバースプロキシで終端し、X-Forwarded-Proto: https を付与する前提。
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 
 # Application definition
@@ -127,3 +162,6 @@ STATICFILES_DIRS = [
 
 LOGIN_REDIRECT_URL = 'index'
 LOGOUT_REDIRECT_URL = 'index'
+
+# 既存マイグレーションの主キー（BigAutoField）と揃える。
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
