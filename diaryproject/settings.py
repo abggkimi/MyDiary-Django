@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 from pathlib import Path
 import os
 
+from django.core.exceptions import ImproperlyConfigured
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -31,15 +33,19 @@ def _env_list(name, default=''):
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
-# 本番では必ず環境変数 DJANGO_SECRET_KEY を設定する。
-# 未設定時の値はローカル確認用で、リポジトリに含まれるため本番では使わない。
-SECRET_KEY = os.environ.get(
-    'DJANGO_SECRET_KEY',
-    '9pGzm5HidY-Wz3o4vFbxUW4ppBm1KQXYbBTYejFVFATBl7cWR54NG5kzDp8Ejv34loG3X4jgRn9HB1LenFGgyA',
-)
-
 # ローカルの HTTP 開発サーバは DJANGO_DEBUG=true で起動する。
 DEBUG = _env_bool('DJANGO_DEBUG', default=False)
+
+# 本番の秘密鍵は環境変数だけから読む。リポジトリ内の値は使わない。
+_secret_key = os.environ.get('DJANGO_SECRET_KEY')
+if _secret_key:
+    SECRET_KEY = _secret_key
+elif DEBUG:
+    SECRET_KEY = 'django-insecure-local-dev-only'
+else:
+    raise ImproperlyConfigured(
+        'DEBUG が False のときは環境変数 DJANGO_SECRET_KEY が必要です。'
+    )
 
 # 本番のホスト名は DJANGO_ALLOWED_HOSTS=example.com,www.example.com のように渡す。
 ALLOWED_HOSTS = _env_list('DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1,[::1]')
