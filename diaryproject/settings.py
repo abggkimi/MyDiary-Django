@@ -19,6 +19,34 @@ from django.core.exceptions import ImproperlyConfigured
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
+def _load_dotenv(path):
+    # テストが環境変数を消したあと、.env で値が戻らないようにする。
+    skip = os.environ.get('DJANGO_SKIP_DOTENV', '')
+    if skip.strip().lower() in {'1', 'true', 'yes', 'on'}:
+        return
+    if not path.is_file():
+        return
+    # utf-8-sig は先頭の BOM を落とす。残ってもキー名からは除く。
+    for raw_line in path.read_text(encoding='utf-8-sig').splitlines():
+        line = raw_line.strip().lstrip('\ufeff')
+        if not line or line.startswith('#') or '=' not in line:
+            continue
+        if line.startswith('export '):
+            line = line[len('export '):].strip()
+        key, value = line.split('=', 1)
+        key = key.strip().lstrip('\ufeff')
+        if not key:
+            continue
+        value = value.strip()
+        if len(value) >= 2 and value[0] == value[-1] and value[0] in {'"', "'"}:
+            value = value[1:-1]
+        os.environ.setdefault(key, value)
+
+
+# 秘密鍵はリポジトリに置かず、gitignore された .env から読む。
+_load_dotenv(BASE_DIR / '.env')
+
+
 def _env_bool(name, default=False):
     value = os.environ.get(name)
     if value is None:
@@ -36,7 +64,7 @@ def _env_list(name, default=''):
 # ローカルの HTTP 開発サーバは DJANGO_DEBUG=true で起動する。
 DEBUG = _env_bool('DJANGO_DEBUG', default=False)
 
-# 本番の秘密鍵は環境変数だけから読む。リポジトリ内の値は使わない。
+# 本番の秘密鍵は環境変数、または .env から読む。リポジトリ内の値は使わない。
 _secret_key = os.environ.get('DJANGO_SECRET_KEY')
 if _secret_key:
     SECRET_KEY = _secret_key
