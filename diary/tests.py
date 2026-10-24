@@ -15,6 +15,8 @@ class SecretKeySettingsTests(SimpleTestCase):
         env = os.environ.copy()
         for name in ('DJANGO_SECRET_KEY', 'DJANGO_DEBUG', 'DJANGO_USE_HTTPS', 'DJANGO_ALLOWED_HOSTS'):
             env.pop(name, None)
+        # 子プロセスがプロジェクトの .env を読み直さない。
+        env['DJANGO_SKIP_DOTENV'] = 'true'
         env.update(extra_env)
         manage = Path(__file__).resolve().parents[1] / 'manage.py'
         return subprocess.run(

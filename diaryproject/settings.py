@@ -20,6 +20,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 def _load_dotenv(path):
+    # テストが環境変数を消したあと、.env で値が戻らないようにする。
+    skip = os.environ.get('DJANGO_SKIP_DOTENV', '')
+    if skip.strip().lower() in {'1', 'true', 'yes', 'on'}:
+        return
     if not path.is_file():
         return
     # utf-8-sig は先頭の BOM を落とす。残ってもキー名からは除く。
